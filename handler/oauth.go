@@ -2,6 +2,8 @@ package handler
 
 import (
 	// "encoding/json"
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -30,6 +32,7 @@ func AuthHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("auth handler")
 	state := r.URL.Query().Get("state")
 	clientId := os.Getenv("TWITTER_CLIENT_ID")
+	clientSecret := os.Getenv("TWITTER_CLIENT_SECRET")
 	html := "<html><body>Error!</body></html>"
 	baseUrl := "https://twitter-endpoint.herokuapp.com/"
 	if state == "" { // no state, this is step 1
@@ -52,9 +55,11 @@ func AuthHandler(w http.ResponseWriter, r *http.Request) {
 			// handle error
 			html = "<html><body>Error from new request!</body></html>"
 		}
+		// encode string to base64
+		basicAuth := base64.StdEncoding.EncodeToString([]byte(clientId + ":" + clientSecret))
 		// set Content-Type header to application/x-www-form-urlencoded
 		request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-		request.Header.Set("Authorization", "Bearer AAAAAAAAAAAAAAAAAAAAAA6VmQEAAAAAQjuxPEE4EiMOKwthNn0H7wHWnss%3DVfBB4jB4mxIrQg1BXkjuFu9ClwrFFb103XfxEkpV2DdP3TH17V")
+		request.Header.Set("Authorization", "Basic "+basicAuth)
 
 		// create a new HTTP client and send the request
 		client := &http.Client{}
@@ -64,13 +69,13 @@ func AuthHandler(w http.ResponseWriter, r *http.Request) {
 		defer response.Body.Close()
 
 		html = "<html><body>Request sent to twitter!</body></html>"
-		// var t OAuthAccessResponse
-		// if err := json.NewDecoder(response.Body).Decode(&t); err != nil {
-		// 	fmt.Fprintf(os.Stdout, "could not parse JSON response: %v", err)
-		// 	w.WriteHeader(http.StatusBadRequest)
-		// 	return
-		// }
-		// html = "<html>" + t.AccessToken + "</html>"
+		var t OAuthAccessResponse
+		if err := json.NewDecoder(response.Body).Decode(&t); err != nil {
+			fmt.Fprintf(os.Stdout, "could not parse JSON response: %v", err)
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		html = "<html>" + t.AccessToken + "</html>"
 
 	}
 	w.Header().Set("Content-Type", "text/html")
