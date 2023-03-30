@@ -42,7 +42,7 @@ func AuthHandler(w http.ResponseWriter, r *http.Request) {
 			"grant_type":    {"authorization_code"},
 			"redirect_uri":  {"" + baseUrl + ""},
 			"client_id":     {"" + clientId + ""},
-			"code_verifier": {"" + codeChallenge + ""}}
+			"code_verifier": {"challenge"}}
 		request, err := http.NewRequest("POST", urlStr, strings.NewReader(values.Encode()))
 		if err != nil {
 			// handle error
