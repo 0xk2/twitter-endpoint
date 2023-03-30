@@ -38,7 +38,10 @@ func AuthHandler(w http.ResponseWriter, r *http.Request) {
 		// create a post request to twitter
 		urlStr := "https://api.twitter.com/2/oauth2/token"
 
-		values := url.Values{"code": {"" + code + ""}, "grant_type": {"authorization_code"}, "client_id": {"" + clientId + ""}, "redirect_uri": {"" + baseUrl + ""},
+		values := url.Values{"code": {"" + code + ""},
+			"grant_type":   {"authorization_code"},
+			"redirect_uri": {"" + baseUrl + ""},
+			// "client_id": {"" + clientId + ""},
 			"code_verifier": {"" + codeChallenge + ""}}
 		request, err := http.NewRequest("POST", urlStr, strings.NewReader(values.Encode()))
 		if err != nil {
@@ -47,6 +50,7 @@ func AuthHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		// set Content-Type header to application/x-www-form-urlencoded
 		request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+		request.Header.Set("Authorization", "Basic AAAAAAAAAAAAAAAAAAAAAA6VmQEAAAAARGYahhjPA4MSrafWKACCMm%2BYV3c%3DRObgcFVf8px7kreYDwAnqNDHxc2qABmJg2TuJhi4Y6eW82FRNI")
 
 		// create a new HTTP client and send the request
 		client := &http.Client{}
