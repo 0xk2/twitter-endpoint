@@ -2,6 +2,7 @@ package handler
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
@@ -46,20 +47,21 @@ func AuthHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		// set Content-Type header to application/x-www-form-urlencoded
 		request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-		html = "<html><body>Request sent!</body></html>"
 
 		// create a new HTTP client and send the request
-		// client := &http.Client{}
-		// response, err := client.Do(request)
-		// if err != nil {
-		// 	// handle error
-		// 	html = "<html><body>Error from response!</body></html>"
-		// }
-		// body, e := ioutil.ReadAll(response.Body)
-		// if e == nil {
-		// 	html = string(body)
-		// }
-		// defer response.Body.Close()
+		client := &http.Client{}
+		response, err := client.Do(request)
+		html = "<html><body>Request sent to twitter!</body></html>"
+		if err != nil {
+			// handle error
+			html = "<html><body>Error from response!</body></html>"
+		} else {
+			body, e := ioutil.ReadAll(response.Body)
+			if e == nil {
+				html = string(body)
+			}
+		}
+		defer response.Body.Close()
 	}
 	w.Header().Set("Content-Type", "text/html")
 	fmt.Fprintf(w, "%s", html)
