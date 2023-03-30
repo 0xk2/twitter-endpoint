@@ -39,9 +39,9 @@ func AuthHandler(w http.ResponseWriter, r *http.Request) {
 		urlStr := "https://api.twitter.com/2/oauth2/token"
 
 		values := url.Values{"code": {"" + code + ""},
-			"grant_type":   {"authorization_code"},
-			"redirect_uri": {"" + baseUrl + ""},
-			// "client_id": {"" + clientId + ""},
+			"grant_type":    {"authorization_code"},
+			"redirect_uri":  {"" + baseUrl + ""},
+			"client_id":     {"" + clientId + ""},
 			"code_verifier": {"" + codeChallenge + ""}}
 		request, err := http.NewRequest("POST", urlStr, strings.NewReader(values.Encode()))
 		if err != nil {
