@@ -2,6 +2,7 @@ package handler
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
@@ -54,11 +55,9 @@ func AuthHandler(w http.ResponseWriter, r *http.Request) {
 			// handle error
 			html = "<html><body>Error from response!</body></html>"
 		}
-		log.Print(response)
-		var b []byte
-		_, e := response.Body.Read(b)
+		body, e := ioutil.ReadAll(response.Body)
 		if e == nil {
-			html = string(b)
+			html = string(body)
 		}
 		defer response.Body.Close()
 	}
