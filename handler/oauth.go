@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"encoding/json"
+	// "encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -20,7 +20,7 @@ type FirstStepResponse struct {
 	Url string `json:"url"`
 }
 
-var codeChallenge = utils.RandString(8)
+var codeChallenge = "code_challenge"
 
 type OAuthAccessResponse struct {
 	AccessToken string `json:"access_token"`
@@ -55,20 +55,23 @@ func AuthHandler(w http.ResponseWriter, r *http.Request) {
 		// set Content-Type header to application/x-www-form-urlencoded
 		request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 		request.Header.Set("Authorization", "Bearer AAAAAAAAAAAAAAAAAAAAAA6VmQEAAAAAQjuxPEE4EiMOKwthNn0H7wHWnss%3DVfBB4jB4mxIrQg1BXkjuFu9ClwrFFb103XfxEkpV2DdP3TH17V")
-		request.Header.Set("accept", "application/json")
 
 		// create a new HTTP client and send the request
 		client := &http.Client{}
+
+		request.Header.Set("accept", "application/json")
 		response, err := client.Do(request)
 		defer response.Body.Close()
+
 		html = "<html><body>Request sent to twitter!</body></html>"
-		var t OAuthAccessResponse
-		if err := json.NewDecoder(response.Body).Decode(&t); err != nil {
-			fmt.Fprintf(os.Stdout, "could not parse JSON response: %v", err)
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		}
-		html = "<html>" + t.AccessToken + "</html>"
+		// var t OAuthAccessResponse
+		// if err := json.NewDecoder(response.Body).Decode(&t); err != nil {
+		// 	fmt.Fprintf(os.Stdout, "could not parse JSON response: %v", err)
+		// 	w.WriteHeader(http.StatusBadRequest)
+		// 	return
+		// }
+		// html = "<html>" + t.AccessToken + "</html>"
+
 	}
 	w.Header().Set("Content-Type", "text/html")
 	fmt.Fprintf(w, "%s", html)
