@@ -21,3 +21,14 @@ func main() {
 	log.Println("Listening on port " + port)
 	http.ListenAndServe(":"+port, nil)
 }
+
+// func main() {
+// 	err := godotenv.Load(".env")
+// 	if err != nil {
+// 		log.Fatal("Error loading .env file")
+// 	}
+// 	clientId := os.Getenv("TWITTER_CLIENT_ID")
+// 	clientSecret := os.Getenv("TWITTER_CLIENT_SECRET")
+// 	basicAuth := base64.StdEncoding.EncodeToString([]byte(clientId + ":" + clientSecret))
+// 	log.Print(basicAuth)
+// }

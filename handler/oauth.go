@@ -25,7 +25,10 @@ type FirstStepResponse struct {
 var codeChallenge = "code_challenge"
 
 type OAuthAccessResponse struct {
+	TokenType   string `json:"token_type"`
+	ExpiresIn   int    `json:"expires_in"`
 	AccessToken string `json:"access_token"`
+	Scope       string `json:"scope"`
 }
 
 func AuthHandler(w http.ResponseWriter, r *http.Request) {
@@ -38,7 +41,9 @@ func AuthHandler(w http.ResponseWriter, r *http.Request) {
 	if state == "" { // no state, this is step 1
 		state = utils.RandString(8)
 
-		firstStepUrl := "https://twitter.com/i/oauth2/authorize?response_type=code&client_id=" + clientId + "&redirect_uri=" + baseUrl + "&scope=tweet.read%20users.read%20tweet.write&state=" + state + "&code_challenge=" + codeChallenge + "&code_challenge_method=plain"
+		firstStepUrl := "https://twitter.com/i/oauth2/authorize?response_type=code&client_id=" + clientId +
+			"&redirect_uri=" + baseUrl +
+			"&scope=tweet.read%20users.read%20tweet.write&state=" + state + "&code_challenge=" + codeChallenge + "&code_challenge_method=plain"
 		html = "<html><body><a href='" + firstStepUrl + "'>Click here</a></body></html>"
 	} else { // if request has state then this is step 2
 		code := r.URL.Query().Get("code")
@@ -71,12 +76,10 @@ func AuthHandler(w http.ResponseWriter, r *http.Request) {
 		html = "<html><body>Request sent to twitter!</body></html>"
 		var t OAuthAccessResponse
 		if err := json.NewDecoder(response.Body).Decode(&t); err != nil {
-			fmt.Fprintf(os.Stdout, "could not parse JSON response: %v", err)
-			w.WriteHeader(http.StatusBadRequest)
-			return
+			html = "<html>Request sent to Twitter, but response is in wrong format</html>"
+		} else {
+			html = "<html><body><div>" + t.TokenType + " " + t.AccessToken + "</div><div>expires in: " + string(t.ExpiresIn) + ", scope: " + t.Scope + "</div></body></html>"
 		}
-		html = "<html>" + t.AccessToken + "</html>"
-
 	}
 	w.Header().Set("Content-Type", "text/html")
 	fmt.Fprintf(w, "%s", html)
