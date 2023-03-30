@@ -47,7 +47,8 @@ func AuthHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		// set Content-Type header to application/x-www-form-urlencoded
 		request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-
+		html = "<html><body>Request sent!</body></html>"
+		return
 		// create a new HTTP client and send the request
 		client := &http.Client{}
 		response, err := client.Do(request)
