@@ -78,7 +78,10 @@ func AuthHandler(w http.ResponseWriter, r *http.Request) {
 		if err := json.NewDecoder(response.Body).Decode(&t); err != nil {
 			html = "<html>Request sent to Twitter, but response is in wrong format</html>"
 		} else {
-			html = "<html><body><div>" + t.TokenType + " " + t.AccessToken + "</div><div>expires in: " + string(t.ExpiresIn) + ", scope: " + t.Scope + "</div></body></html>"
+			jsonData, e := json.Marshal(t)
+			if e == nil {
+				html = "<html><body><div>" + string(jsonData) + "</div></body></html>"
+			}
 		}
 	}
 	w.Header().Set("Content-Type", "text/html")
