@@ -1,8 +1,8 @@
 package handler
 
 import (
+	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
@@ -21,6 +21,10 @@ type FirstStepResponse struct {
 }
 
 var codeChallenge = utils.RandString(8)
+
+type OAuthAccessResponse struct {
+	AccessToken string `json:"access_token"`
+}
 
 func AuthHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("auth handler")
@@ -51,24 +55,20 @@ func AuthHandler(w http.ResponseWriter, r *http.Request) {
 		// set Content-Type header to application/x-www-form-urlencoded
 		request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 		request.Header.Set("Authorization", "Bearer AAAAAAAAAAAAAAAAAAAAAA6VmQEAAAAAQjuxPEE4EiMOKwthNn0H7wHWnss%3DVfBB4jB4mxIrQg1BXkjuFu9ClwrFFb103XfxEkpV2DdP3TH17V")
+		request.Header.Set("accept", "application/json")
 
 		// create a new HTTP client and send the request
 		client := &http.Client{}
 		response, err := client.Do(request)
-		html = "<html><body>Request sent to twitter!</body></html>"
-		if err != nil {
-			// handle error
-			html = "<html><body>Error from response!</body></html>"
-		} else {
-			body, e := ioutil.ReadAll(response.Body)
-			if e == nil {
-				html = string(body)
-				if html == "" {
-					html = "<html><body>Body is empty!</body></html>"
-				}
-			}
-		}
 		defer response.Body.Close()
+		html = "<html><body>Request sent to twitter!</body></html>"
+		var t OAuthAccessResponse
+		if err := json.NewDecoder(response.Body).Decode(&t); err != nil {
+			fmt.Fprintf(os.Stdout, "could not parse JSON response: %v", err)
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		html = "<html>" + t.AccessToken + "</html>"
 	}
 	w.Header().Set("Content-Type", "text/html")
 	fmt.Fprintf(w, "%s", html)
