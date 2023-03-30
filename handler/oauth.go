@@ -2,7 +2,6 @@ package handler
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
@@ -56,15 +55,15 @@ func AuthHandler(w http.ResponseWriter, r *http.Request) {
 		client := &http.Client{}
 		response, err := client.Do(request)
 		html = "<html><body>Request sent to twitter!</body></html>"
-		if err != nil {
-			// handle error
-			html = "<html><body>Error from response!</body></html>"
-		} else {
-			body, e := ioutil.ReadAll(response.Body)
-			if e == nil {
-				html = string(body)
-			}
-		}
+		// if err != nil {
+		// 	// handle error
+		// 	html = "<html><body>Error from response!</body></html>"
+		// } else {
+		// 	body, e := ioutil.ReadAll(response.Body)
+		// 	if e == nil {
+		// 		html = string(body)
+		// 	}
+		// }
 		defer response.Body.Close()
 	}
 	w.Header().Set("Content-Type", "text/html")
